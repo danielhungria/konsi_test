@@ -78,7 +78,9 @@ class _MapScreenState extends State<MapScreen> {
                 top: 70,
                 left: 10,
                 right: 10,
-                child: SearchBarWidget(focusNode: focusNode,),
+                child: SearchBarWidget(
+                  focusNode: focusNode,
+                ),
               ),
             ],
           );

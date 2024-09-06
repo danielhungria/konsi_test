@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
 
 class CepBottomSheet extends StatelessWidget {
@@ -46,8 +47,18 @@ class CepBottomSheet extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.pop(context);
+                  context.go(
+                    '/review',
+                    extra: {
+                      'cep': cep,
+                      'address': address,
+                    },
+                  );
                 },
-                child: const Text('Salvar Endereço', style: TextStyle(color: Colours.lightTileBackgroundColour),),
+                child: const Text(
+                  'Salvar Endereço',
+                  style: TextStyle(color: Colours.lightTileBackgroundColour),
+                ),
               ),
             ),
           ],
