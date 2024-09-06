@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'map_event.dart';
+
 part 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
@@ -14,17 +15,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   void _onSearchChanged(
-      SearchChanged event,
-      Emitter<MapState> emit,
-      ) {
+    SearchChanged event,
+    Emitter<MapState> emit,
+  ) {
     final results = _filterSearchResults(event.query);
     emit(SearchResults(results));
   }
 
   void _onResultSelected(
-      ResultSelected event,
-      Emitter<MapState> emit,
-      ) {
+    ResultSelected event,
+    Emitter<MapState> emit,
+  ) {
     final position = _getLatLngForAddress(event.address);
     final markers = {
       Marker(
@@ -33,6 +34,11 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         infoWindow: InfoWindow(title: event.address),
       ),
     };
+    final cep = event.address.split(' - ')[0];
+    final endereco = event.address.split(' - ')[1];
+
+    emit(ShowBottomSheetState(cep, endereco));
+
     emit(MapWithMarkers(position, markers));
   }
 

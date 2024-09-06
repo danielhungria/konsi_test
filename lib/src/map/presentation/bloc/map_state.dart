@@ -38,3 +38,13 @@ class MapError extends MapState {
   @override
   List<Object> get props => [message];
 }
+
+class ShowBottomSheetState extends MapState {
+  final String cep;
+  final String endereco;
+
+  const ShowBottomSheetState(this.cep, this.endereco);
+
+  @override
+  List<Object> get props => [cep, endereco];
+}

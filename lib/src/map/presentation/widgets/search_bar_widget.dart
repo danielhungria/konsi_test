@@ -6,7 +6,8 @@ import '../../../../core/res/colours.dart';
 import '../bloc/map_bloc.dart';
 
 class SearchBarWidget extends StatelessWidget {
-  const SearchBarWidget({super.key});
+  final FocusNode focusNode;
+  const SearchBarWidget({super.key, required this.focusNode});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,7 @@ class SearchBarWidget extends StatelessWidget {
         ],
       ),
       child: TextField(
+        focusNode: focusNode,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,

@@ -3,16 +3,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:konsi_test/core/res/colours.dart';
 import '../bloc/map_bloc.dart';
+import '../widgets/cep_bottom_sheet.dart';
 import '../widgets/search_bar_widget.dart';
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
+
+  @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  FocusNode focusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => MapBloc(),
-      child: BlocBuilder<MapBloc, MapState>(
+      child: BlocConsumer<MapBloc, MapState>(
+        listener: (context, state) {
+          if (state is ShowBottomSheetState) {
+            _showBottomSheet(context, state.cep, state.endereco);
+          }
+        },
         builder: (context, state) {
           return Stack(
             children: [
@@ -39,7 +52,7 @@ class MapScreen extends StatelessWidget {
                               final cep = result.split(' - ')[0];
                               final endereco = result.split(' - ')[1];
                               return ListTile(
-                                leading: const Icon(Icons.location_on, color: Colors.blue),
+                                leading: const Icon(Icons.location_on, color: Colours.primaryColour),
                                 title: Text(
                                   cep,
                                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -49,6 +62,7 @@ class MapScreen extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 onTap: () {
+                                  focusNode.unfocus();
                                   context.read<MapBloc>().add(ResultSelected(result));
                                 },
                               );
@@ -60,16 +74,37 @@ class MapScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              const Positioned(
+              Positioned(
                 top: 70,
                 left: 10,
                 right: 10,
-                child: SearchBarWidget(),
+                child: SearchBarWidget(focusNode: focusNode,),
               ),
             ],
           );
         },
       ),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context, String cep, String address) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colours.lightTileBackgroundColour,
+      useRootNavigator: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16),
+        ),
+      ),
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        return CepBottomSheet(
+          cep: cep,
+          address: address,
+        );
+      },
     );
   }
 }
