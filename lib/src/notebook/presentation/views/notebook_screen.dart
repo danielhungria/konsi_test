@@ -1,14 +1,93 @@
 // lib/src/presentation/notebook_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:konsi_test/core/res/colours.dart';
 
-class NotebookScreen extends StatelessWidget {
+import '../../../../core/services/injection_container.dart';
+import '../../../map/presentation/widgets/search_bar_widget.dart';
+import '../bloc/notebook_bloc.dart';
+
+class NotebookScreen extends StatefulWidget {
   const NotebookScreen({super.key});
 
   @override
+  State<NotebookScreen> createState() => _NotebookScreenState();
+}
+
+class _NotebookScreenState extends State<NotebookScreen> {
+  final notebookBloc = sl<NotebookBloc>();
+
+  @override
+  void initState() {
+    super.initState();
+    notebookBloc.add(LoadAddresses());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Tela da Caderneta'),
+    return BlocProvider(
+      create: (context) => notebookBloc,
+      child: Scaffold(
+        backgroundColor: Colours.lightTileBackgroundColour,
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 70.0, left: 10, right: 10),
+              child: SearchBarWidget(
+                focusNode: FocusNode(),
+                onSearchChanged: (query) {
+                  notebookBloc.add(SearchChanged(query));
+                },
+              ),
+            ),
+            Expanded(
+              child: BlocBuilder<NotebookBloc, NotebookState>(
+                builder: (context, state) {
+                  if (state is NotebookLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is NotebookLoaded) {
+                    return ListView.separated(
+                      itemCount: state.addresses.length,
+                      itemBuilder: (context, index) {
+                        final address = state.addresses[index];
+                        return ListTile(
+                          title: Text(
+                            address.cep,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            address.street,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          trailing: IconButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colours.softBackgroundColour),
+                            ),
+                            icon: const Icon(
+                              Icons.bookmark,
+                              color: Colours.primaryColour,
+                            ),
+                            onPressed: () {
+                              // notebookBloc.add(RemoveAddress(address));
+                            },
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Divider(color: Colours.borderColour),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Nenhum endereço salvo.'),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

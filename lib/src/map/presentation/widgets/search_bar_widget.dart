@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/res/colours.dart';
-import '../bloc/map_bloc.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final FocusNode focusNode;
-  const SearchBarWidget({super.key, required this.focusNode});
+  final void Function(String) onSearchChanged;
+
+  const SearchBarWidget({
+    super.key,
+    required this.focusNode,
+    required this.onSearchChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +34,7 @@ class SearchBarWidget extends StatelessWidget {
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
-        onChanged: (query) {
-          context.read<MapBloc>().add(SearchChanged(query));
-        },
+        onChanged: onSearchChanged,
         decoration: const InputDecoration(
           border: InputBorder.none,
           hintText: 'Buscar',

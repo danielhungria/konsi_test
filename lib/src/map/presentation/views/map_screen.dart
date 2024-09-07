@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import '../../../../core/services/injection_container.dart';
 import '../bloc/map_bloc.dart';
 import '../widgets/cep_bottom_sheet.dart';
 import '../widgets/search_bar_widget.dart';
@@ -18,8 +19,9 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mapBloc = sl<MapBloc>();
     return BlocProvider(
-      create: (_) => MapBloc(),
+      create: (_) => mapBloc,
       child: BlocConsumer<MapBloc, MapState>(
         listener: (context, state) {
           if (state is ShowBottomSheetState) {
@@ -63,7 +65,7 @@ class _MapScreenState extends State<MapScreen> {
                                 ),
                                 onTap: () {
                                   focusNode.unfocus();
-                                  context.read<MapBloc>().add(ResultSelected(result));
+                                  mapBloc.add(ResultSelected(result));
                                 },
                               );
                             },
@@ -80,6 +82,9 @@ class _MapScreenState extends State<MapScreen> {
                 right: 10,
                 child: SearchBarWidget(
                   focusNode: focusNode,
+                  onSearchChanged: (search) {
+                    mapBloc.add(SearchChanged(search));
+                  },
                 ),
               ),
             ],

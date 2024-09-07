@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import '../../src/home/presentation/views/home_page.dart';
+import '../../src/notebook/presentation/views/notebook_screen.dart';
 import '../../src/review/presentation/views/review_screen.dart';
 import '../../src/splash_screen/presentation/views/splash_screen.dart';
 
@@ -13,7 +14,10 @@ class AppRouter {
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const HomePage(),
+        builder: (context, state) {
+          final tab = int.tryParse(state.uri.queryParameters['tab'] ?? '0') ?? 0;
+          return HomePage(initialTab: tab);
+        },
       ),
       GoRoute(
         path: '/review',
@@ -24,6 +28,10 @@ class AppRouter {
           return ReviewScreen(cep: cep, address: address);
         },
       ),
+      GoRoute(
+        path: '/notebook',
+        builder: (context, state) => const NotebookScreen(),
+      )
     ],
   );
 }

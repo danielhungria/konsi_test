@@ -44,7 +44,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   List<String> _mockSearchResults() {
     return [
-      '12345-678 - Rua Exemplo, Bairro A',
+      '12345-678 - Rua Exemplo, Beairro A',
       '23456-789 - Rua Teste, Bairro B',
       '34567-890 - Rua Fictícia, Bairro C'
     ];

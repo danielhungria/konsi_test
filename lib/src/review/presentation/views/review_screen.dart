@@ -66,10 +66,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
             const SizedBox(height: 16.0),
             _buildTextField(
               label: 'Número',
+              controller: _numberController,
             ),
             const SizedBox(height: 16.0),
             _buildTextField(
               label: 'Complemento',
+              controller: _complementController,
             ),
             const Spacer(),
             SizedBox(
@@ -138,7 +140,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
     print('Número: $number');
     print('Complemento: $complement');
-    // context.go('/nextScreen');
+    context.go('/home?tab=1');
   }
 
 }

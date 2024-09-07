@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:konsi_test/core/res/app_theme.dart';
+import 'package:konsi_test/core/services/injection_container.dart';
 
-import 'core/router/app_router.dart';
+import 'core/services/app_router.dart';
 
 void main() {
+  init();
   runApp(MyApp());
 }
 
