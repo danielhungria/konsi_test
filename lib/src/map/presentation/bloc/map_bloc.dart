@@ -61,7 +61,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final cep = event.address.split(' - ')[0];
     final address = event.address.split(' - ')[1];
 
-    emit(ShowBottomSheetState(cep, endereco));
+    emit(ShowBottomSheetState(cep, address));
 
     emit(MapWithMarkers(position, markers));
   }
