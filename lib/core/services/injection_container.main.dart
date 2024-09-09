@@ -42,6 +42,7 @@ Future<void> _initOnBoarding() async {
     ..registerFactory(
       () => MapBloc(
         sl(),
+        sl(),
       ),
     )
     ..registerFactory(
@@ -50,4 +51,5 @@ Future<void> _initOnBoarding() async {
 
   // External
   sl.registerLazySingleton(() => http.Client());
+  sl.registerLazySingleton(() => GeocodingService());
 }

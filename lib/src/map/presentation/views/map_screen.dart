@@ -10,6 +10,7 @@ import '../widgets/search_bar_widget.dart';
 
 class MapScreen extends StatefulWidget {
   final MapBloc mapBloc;
+
   const MapScreen({super.key, required this.mapBloc});
 
   @override
@@ -17,6 +18,7 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  GoogleMapController? _mapController;
   FocusNode focusNode = FocusNode();
   String cepNumber = '';
 
@@ -34,7 +36,8 @@ class _MapScreenState extends State<MapScreen> {
           return Stack(
             children: [
               if (state is MapWithMarkers || state is MapInitial) _buildMap(state),
-              if (state is SearchResults || state is SearchResultError) _buildSearchResultsOrError(state, widget.mapBloc),
+              if (state is SearchResults || state is SearchResultError)
+                _buildSearchResultsOrError(state, widget.mapBloc),
               Positioned(
                 top: 70,
                 left: 10,
@@ -61,6 +64,12 @@ class _MapScreenState extends State<MapScreen> {
         zoom: 12,
       ),
       markers: state is MapWithMarkers ? state.markers : {},
+      onMapCreated: (controller) {
+        _mapController = controller;
+        if (state is MapWithMarkers) {
+          _moveCameraToMarker(state);
+        }
+      },
     );
   }
 
@@ -83,7 +92,7 @@ class _MapScreenState extends State<MapScreen> {
             focusNode.unfocus();
             if (cepNumber.isNotEmpty && cepNumber.length == 8) {
               mapBloc.add(ClickSearch(cepNumber));
-            }else{
+            } else {
               CoreUtils.showSnackBar(context, 'INVALID CEP');
             }
           },
@@ -127,7 +136,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
             onTap: () {
               focusNode.unfocus();
-              // mapBloc.add(ResultSelected(result));
+              widget.mapBloc.add(ResultSelected(result));
             },
           );
         },
@@ -155,5 +164,16 @@ class _MapScreenState extends State<MapScreen> {
         );
       },
     );
+  }
+
+  void _moveCameraToMarker(MapWithMarkers state) {
+    if (state.markers.isNotEmpty && _mapController != null) {
+      final Marker marker = state.markers.first;
+      final LatLng markerPosition = marker.position;
+
+      _mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(markerPosition, 16),
+      );
+    }
   }
 }

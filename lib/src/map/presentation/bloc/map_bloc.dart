@@ -4,11 +4,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:konsi_test/src/map/domain/entities/cep.dart';
 import 'package:konsi_test/src/map/domain/usecases/fetch_cep.dart';
 
+import '../../../../core/services/geocoding_service.dart';
+
 part 'map_event.dart';
 part 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
-  MapBloc(this.fetchCepUsecase) : super(const MapInitial()) {
+  MapBloc(this.fetchCepUsecase, this.geocodingService) : super(const MapInitial()) {
     on<SearchChanged>(_onSearchChanged);
     on<ResultSelected>(_onResultSelected);
     on<ClickSearch>(_onClickSearch);
@@ -16,6 +18,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
   final FetchCepUsecase fetchCepUsecase;
+  final GeocodingService geocodingService;
   List<Cep> history = [];
 
   Future<void> _onSearchChanged(
@@ -46,24 +49,26 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     );
   }
 
-  void _onResultSelected(
+  Future<void> _onResultSelected(
     ResultSelected event,
     Emitter<MapState> emit,
-  ) {
-    final position = _getLatLngForAddress(event.address);
-    final markers = {
-      Marker(
-        markerId: const MarkerId('selected_location'),
-        position: position,
-        infoWindow: InfoWindow(title: event.address),
-      ),
-    };
-    final cep = event.address.split(' - ')[0];
-    final address = event.address.split(' - ')[1];
+  ) async {
+    final latLng = await geocodingService.getLatLngFromCep(event.cep.cep);
+    if (latLng != null) {
+      final markers = {
+            Marker(
+              markerId: const MarkerId('selected_location'),
+              position: latLng,
+              infoWindow: InfoWindow(title: event.cep.logradouro),
+            ),
+          };
+      final cep = event.cep.cep;
+      final address = event.cep.logradouro;
 
-    emit(ShowBottomSheetState(cep, address));
+      emit(ShowBottomSheetState(cep, address));
 
-    emit(MapWithMarkers(position, markers));
+      emit(MapWithMarkers(latLng, markers));
+    }
   }
 
   void _onResetMap(ResetMap event,Emitter<MapState> emit,) async {
@@ -75,16 +80,4 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     return result;
   }
 
-  LatLng _getLatLngForAddress(String address) {
-    switch (address) {
-      case '12345-678 - Rua Exemplo, Bairro A':
-        return const LatLng(-12.906396, -38.397681);
-      case '23456-789 - Rua Teste, Bairro B':
-        return const LatLng(-12.900000, -38.400000);
-      case '34567-890 - Rua Fictícia, Bairro C':
-        return const LatLng(-12.910000, -38.405000);
-      default:
-        return const LatLng(-12.906396, -38.397681);
-    }
-  }
 }
