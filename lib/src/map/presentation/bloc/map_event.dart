@@ -24,3 +24,18 @@ class ResultSelected extends MapEvent {
   @override
   List<Object> get props => [address];
 }
+
+class ClickSearch extends MapEvent {
+  final String query;
+
+  const ClickSearch(this.query);
+
+  @override
+  List<Object> get props => [query];
+}
+
+class ResetMap extends MapEvent {
+
+  @override
+  List<Object> get props => [];
+}

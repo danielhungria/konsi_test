@@ -7,14 +7,47 @@ Future<void> init() async {
 }
 
 Future<void> _initOnBoarding() async {
+  // DataSources
+  sl.registerLazySingleton<CepRemoteDataSource>(
+    () => CepRemoteDataSourceImpl(
+      client: sl(),
+    ),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<CepRepository>(
+    () => CepRepositoryImpl(
+      remoteDataSource: sl(),
+    ),
+  );
+
+  // UseCases
+  sl
+    ..registerLazySingleton(
+      () => FetchCepUsecase(
+        sl(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => FetchCepParams(
+        cep: '',
+      ),
+    );
+
+  // Bloc
   sl
     ..registerFactory(
       () => NotebookBloc(),
     )
     ..registerFactory(
-      () => MapBloc(),
+      () => MapBloc(
+        sl(),
+      ),
     )
-      ..registerFactory(
+    ..registerFactory(
       () => NavigationBloc(),
     );
+
+  // External
+  sl.registerLazySingleton(() => http.Client());
 }

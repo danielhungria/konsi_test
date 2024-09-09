@@ -12,12 +12,21 @@ class MapInitial extends MapState {
 }
 
 class SearchResults extends MapState {
-  final List<String> results;
+  final List<Cep> cep;
 
-  const SearchResults(this.results);
+  const SearchResults(this.cep);
 
   @override
-  List<Object> get props => [results];
+  List<Object> get props => [cep];
+}
+
+class SearchResultError extends MapState {
+  final String message;
+
+  const SearchResultError(this.message);
+
+  @override
+  List<Object> get props => [message];
 }
 
 class MapWithMarkers extends MapState {

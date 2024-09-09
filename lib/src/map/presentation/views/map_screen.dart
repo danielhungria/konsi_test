@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:konsi_test/core/res/colours.dart';
-import '../../../../core/services/injection_container.dart';
+import 'package:konsi_test/core/utils/core_utils.dart';
+
 import '../bloc/map_bloc.dart';
 import '../widgets/cep_bottom_sheet.dart';
 import '../widgets/search_bar_widget.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  final MapBloc mapBloc;
+  const MapScreen({super.key, required this.mapBloc});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -16,12 +18,12 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   FocusNode focusNode = FocusNode();
+  String cepNumber = '';
 
   @override
   Widget build(BuildContext context) {
-    final mapBloc = sl<MapBloc>();
-    return BlocProvider(
-      create: (_) => mapBloc,
+    return BlocProvider.value(
+      value: widget.mapBloc,
       child: BlocConsumer<MapBloc, MapState>(
         listener: (context, state) {
           if (state is ShowBottomSheetState) {
@@ -31,51 +33,8 @@ class _MapScreenState extends State<MapScreen> {
         builder: (context, state) {
           return Stack(
             children: [
-              if (state is MapWithMarkers || state is MapInitial)
-                GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(-12.906396, -38.397681),
-                    zoom: 12,
-                  ),
-                  markers: state is MapWithMarkers ? state.markers : {},
-                ),
-              if (state is SearchResults)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 130),
-                        Expanded(
-                          child: ListView.separated(
-                            itemCount: state.results.length,
-                            itemBuilder: (context, index) {
-                              final result = state.results[index];
-                              final cep = result.split(' - ')[0];
-                              final endereco = result.split(' - ')[1];
-                              return ListTile(
-                                leading: const Icon(Icons.location_on, color: Colours.primaryColour),
-                                title: Text(
-                                  cep,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(
-                                  endereco,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                onTap: () {
-                                  focusNode.unfocus();
-                                  mapBloc.add(ResultSelected(result));
-                                },
-                              );
-                            },
-                            separatorBuilder: (context, index) => const Divider(color: Colours.borderColour),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              if (state is MapWithMarkers || state is MapInitial) _buildMap(state),
+              if (state is SearchResults || state is SearchResultError) _buildSearchResultsOrError(state, widget.mapBloc),
               Positioned(
                 top: 70,
                 left: 10,
@@ -83,13 +42,96 @@ class _MapScreenState extends State<MapScreen> {
                 child: SearchBarWidget(
                   focusNode: focusNode,
                   onSearchChanged: (search) {
-                    mapBloc.add(SearchChanged(search));
+                    widget.mapBloc.add(SearchChanged(search));
+                    cepNumber = search;
                   },
                 ),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildMap(MapState state) {
+    return GoogleMap(
+      initialCameraPosition: const CameraPosition(
+        target: LatLng(-12.906396, -38.397681),
+        zoom: 12,
+      ),
+      markers: state is MapWithMarkers ? state.markers : {},
+    );
+  }
+
+  Widget _buildSearchResultsOrError(MapState state, MapBloc mapBloc) {
+    return Positioned.fill(
+      child: Scaffold(
+        backgroundColor: Colours.lightTileBackgroundColour,
+        body: Column(
+          children: [
+            const SizedBox(height: 130),
+            if (state is SearchResultError)
+              _buildErrorWidget(state)
+            else if (state is SearchResults)
+              _buildSearchResultsList(state)
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colours.primaryColour,
+          onPressed: () {
+            focusNode.unfocus();
+            if (cepNumber.isNotEmpty && cepNumber.length == 8) {
+              mapBloc.add(ClickSearch(cepNumber));
+            }else{
+              CoreUtils.showSnackBar(context, 'INVALID CEP');
+            }
+          },
+          child: const Icon(Icons.search),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget(SearchResultError state) {
+    return Expanded(
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'INVALID CEP: ${state.message}',
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResultsList(SearchResults state) {
+    return Expanded(
+      child: ListView.separated(
+        itemCount: state.cep.length,
+        itemBuilder: (context, index) {
+          final result = state.cep[index];
+          final cep = result.cep;
+          final address = result.bairro;
+          return ListTile(
+            leading: const Icon(Icons.location_on, color: Colours.primaryColour),
+            title: Text(
+              cep,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              address,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+              focusNode.unfocus();
+              // mapBloc.add(ResultSelected(result));
+            },
+          );
+        },
+        separatorBuilder: (context, index) => const Divider(color: Colours.borderColour),
       ),
     );
   }

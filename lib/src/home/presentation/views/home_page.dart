@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import 'package:konsi_test/src/map/presentation/bloc/map_bloc.dart';
 
 import '../../../../core/services/injection_container.dart';
 import '../../../map/presentation/views/map_screen.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final navigationBloc = sl<NavigationBloc>();
+  final mapBloc = sl<MapBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +32,9 @@ class _HomePageState extends State<HomePage> {
           return Scaffold(
             body: IndexedStack(
               index: selectedIndex,
-              children: const [
-                MapScreen(),
-                NotebookScreen(),
+              children: [
+                MapScreen(mapBloc: mapBloc,),
+                const NotebookScreen(),
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -50,6 +52,7 @@ class _HomePageState extends State<HomePage> {
               currentIndex: selectedIndex,
               onTap: (index) {
                 navigationBloc.add(ChangeTabEvent(index));
+                mapBloc.add(ResetMap());
               },
             ),
           );
