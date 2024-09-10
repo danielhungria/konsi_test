@@ -75,6 +75,10 @@ class _MapScreenState extends State<MapScreen> {
           _moveCameraToMarker(state);
         }
       },
+      onTap: (position) {
+        focusNode.unfocus();
+        sl<MapBloc>().add(MapTap(position));
+      },
     );
   }
 

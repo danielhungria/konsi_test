@@ -25,6 +25,15 @@ class ResultSelected extends MapEvent {
   List<Object> get props => [cep];
 }
 
+class MapTap extends MapEvent {
+  final LatLng position;
+
+  const MapTap(this.position);
+
+  @override
+  List<Object> get props => [position];
+}
+
 class ClickSearch extends MapEvent {
   final String query;
 

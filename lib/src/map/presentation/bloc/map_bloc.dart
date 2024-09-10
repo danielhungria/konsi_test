@@ -11,11 +11,16 @@ part 'map_event.dart';
 part 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
-  MapBloc(this.fetchCepUsecase, this.geocodingService, this.historyBox,) : super(const MapInitial()) {
+  MapBloc(
+    this.fetchCepUsecase,
+    this.geocodingService,
+    this.historyBox,
+  ) : super(const MapInitial()) {
     on<SearchChanged>(_onSearchChanged);
     on<ResultSelected>(_onResultSelected);
     on<ClickSearch>(_onClickSearch);
     on<ResetMap>(_onResetMap);
+    on<MapTap>(_onMapTap);
     history = List<Cep>.from(historyBox.values);
   }
 
@@ -62,23 +67,52 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final formattedAddress = '${event.cep.logradouro} - ${event.cep.bairro}, ${event.cep.localidade} - ${event.cep.uf}';
     if (latLng != null) {
       final markers = {
-            Marker(
-              markerId: const MarkerId('selected_location'),
-              position: latLng,
-              infoWindow: InfoWindow(title: event.cep.logradouro),
-            ),
-          };
+        Marker(
+          markerId: const MarkerId('selected_location'),
+          position: latLng,
+          infoWindow: InfoWindow(title: event.cep.logradouro),
+        ),
+      };
       final cep = event.cep.cep;
 
       emit(ShowBottomSheetState(cep, formattedAddress));
 
       emit(MapWithMarkers(latLng, markers));
-    }else{
+    } else {
       emit(const MapError('Erro ao buscar dados do CEP'));
     }
   }
 
-  void _onResetMap(ResetMap event,Emitter<MapState> emit,) async {
+  Future<void> _onMapTap(
+    MapTap event,
+    Emitter<MapState> emit,
+  ) async {
+    final latLng = event.position;
+
+    final cep = await geocodingService.getCepFromLatLng(latLng);
+
+    if (cep != null) {
+      final formattedAddress = '${cep.logradouro} - ${cep.bairro}, ${cep.localidade} - ${cep.uf}';
+      final markers = {
+        Marker(
+          markerId: const MarkerId('selected_location'),
+          position: latLng,
+          infoWindow: InfoWindow(title: formattedAddress),
+        ),
+      };
+
+      emit(ShowBottomSheetState(cep.cep, formattedAddress));
+
+      emit(MapWithMarkers(latLng, markers));
+    } else {
+      emit(const MapError('Erro ao buscar dados do CEP'));
+    }
+  }
+
+  void _onResetMap(
+    ResetMap event,
+    Emitter<MapState> emit,
+  ) async {
     emit(const MapInitial());
   }
 
@@ -86,5 +120,4 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     final result = history.where((cep) => cep.cep.replaceAll('-', '').contains(query)).toList();
     return result;
   }
-
 }

@@ -53,13 +53,14 @@ class _NotebookScreenState extends State<NotebookScreen> {
                       itemCount: state.addresses.length,
                       itemBuilder: (context, index) {
                         final address = state.addresses[index];
+                        final formattedAddress = '${address.street}, ${address.number} - ${address.complement}';
                         return ListTile(
                           title: Text(
                             address.cep,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            address.street,
+                            formattedAddress,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -75,6 +76,16 @@ class _NotebookScreenState extends State<NotebookScreen> {
                               sl<NotebookBloc>().add(RemoveAddress(address));
                             },
                           ),
+                          onTap: () {
+                            //TODO -
+                            // context.go(
+                            //   '/review',
+                            //   extra: {
+                            //     'cep': address.cep,
+                            //     'address': formattedAddress,
+                            //   },
+                            // );
+                          },
                         );
                       },
                       separatorBuilder: (context, index) => const Divider(color: Colours.borderColour),

@@ -55,7 +55,7 @@ Future<void> _initOnBoarding() async {
 
   // External
   sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => GeocodingService());
+  sl.registerLazySingleton(() => GeocodingService(client: sl()));
 }
 
 Future<void> _initHive() async {
