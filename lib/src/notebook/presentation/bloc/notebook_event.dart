@@ -12,11 +12,21 @@ class LoadAddresses extends NotebookEvent {
   List<Object> get props => [];
 }
 
-class SearchChanged extends NotebookEvent {
+class SearchChangedNotebook extends NotebookEvent {
   final String query;
 
-  SearchChanged(this.query);
+  SearchChangedNotebook(this.query);
 
   @override
   List<Object> get props => [query];
 }
+
+class AddAddress extends NotebookEvent {
+  final Address address;
+
+  AddAddress(this.address);
+
+  @override
+  List<Object> get props => [address];
+}
+

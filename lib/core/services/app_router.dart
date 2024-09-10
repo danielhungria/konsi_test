@@ -1,6 +1,8 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../src/home/presentation/views/home_page.dart';
-import '../../src/notebook/presentation/views/notebook_screen.dart';
+import '../../src/notebook/presentation/bloc/notebook_bloc.dart';
 import '../../src/review/presentation/views/review_screen.dart';
 import '../../src/splash_screen/presentation/views/splash_screen.dart';
 
@@ -22,16 +24,16 @@ class AppRouter {
       GoRoute(
         path: '/review',
         builder: (context, state) {
-          final args = state.extra as Map<String, String>;
+          final args = state.extra as Map<String, dynamic>;
           final cep = args['cep']!;
           final address = args['address']!;
-          return ReviewScreen(cep: cep, address: address);
+          final notebookBloc = args['notebookBloc']!;
+          return BlocProvider.value(
+            value: notebookBloc as NotebookBloc,
+            child: ReviewScreen(cep: cep, address: address, notebookBloc: notebookBloc),
+          );
         },
       ),
-      GoRoute(
-        path: '/notebook',
-        builder: (context, state) => const NotebookScreen(),
-      )
     ],
   );
 }

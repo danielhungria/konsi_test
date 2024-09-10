@@ -1,33 +1,35 @@
-// lib/src/presentation/notebook_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:konsi_test/core/res/colours.dart';
 
-import '../../../../core/services/injection_container.dart';
 import '../../../map/presentation/widgets/search_bar_widget.dart';
 import '../bloc/notebook_bloc.dart';
 
 class NotebookScreen extends StatefulWidget {
-  const NotebookScreen({super.key});
+  final NotebookBloc notebookBloc;
+  const NotebookScreen({super.key, required this.notebookBloc});
 
   @override
   State<NotebookScreen> createState() => _NotebookScreenState();
 }
 
 class _NotebookScreenState extends State<NotebookScreen> {
-  final notebookBloc = sl<NotebookBloc>();
 
   @override
   void initState() {
     super.initState();
-    notebookBloc.add(LoadAddresses());
+    widget.notebookBloc.add(LoadAddresses());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => notebookBloc,
+    return BlocProvider.value(
+      value: widget.notebookBloc,
       child: Scaffold(
         backgroundColor: Colours.lightTileBackgroundColour,
         body: Column(
@@ -37,7 +39,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
               child: SearchBarWidget(
                 focusNode: FocusNode(),
                 onSearchChanged: (query) {
-                  notebookBloc.add(SearchChanged(query));
+                  widget.notebookBloc.add(SearchChangedNotebook(query));
                 },
               ),
             ),

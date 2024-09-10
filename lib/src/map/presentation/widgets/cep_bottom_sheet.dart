@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import 'package:konsi_test/src/notebook/presentation/bloc/notebook_bloc.dart';
 
 class CepBottomSheet extends StatelessWidget {
   final String cep;
   final String address;
+  final NotebookBloc notebookBloc;
 
   const CepBottomSheet({
     super.key,
     required this.cep,
     required this.address,
+    required this.notebookBloc,
   });
 
   @override
@@ -52,6 +55,7 @@ class CepBottomSheet extends StatelessWidget {
                     extra: {
                       'cep': cep,
                       'address': address,
+                      'notebookBloc': notebookBloc,
                     },
                   );
                 },

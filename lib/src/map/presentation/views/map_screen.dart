@@ -4,14 +4,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:konsi_test/core/res/colours.dart';
 import 'package:konsi_test/core/utils/core_utils.dart';
 
+import '../../../notebook/presentation/bloc/notebook_bloc.dart';
 import '../bloc/map_bloc.dart';
 import '../widgets/cep_bottom_sheet.dart';
 import '../widgets/search_bar_widget.dart';
 
 class MapScreen extends StatefulWidget {
   final MapBloc mapBloc;
+  final NotebookBloc notebookBloc;
 
-  const MapScreen({super.key, required this.mapBloc});
+  const MapScreen({
+    super.key,
+    required this.mapBloc,
+    required this.notebookBloc,
+  });
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -161,6 +167,7 @@ class _MapScreenState extends State<MapScreen> {
         return CepBottomSheet(
           cep: cep,
           address: address,
+          notebookBloc: widget.notebookBloc,
         );
       },
     );

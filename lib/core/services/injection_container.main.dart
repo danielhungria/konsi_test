@@ -36,7 +36,7 @@ Future<void> _initOnBoarding() async {
 
   // Bloc
   sl
-    ..registerFactory(
+    ..registerLazySingleton(
       () => NotebookBloc(),
     )
     ..registerFactory(

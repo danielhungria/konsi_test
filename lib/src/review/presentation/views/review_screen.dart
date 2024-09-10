@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import 'package:konsi_test/src/notebook/presentation/bloc/notebook_bloc.dart';
+
+import '../../../notebook/domain/entities/address.dart';
 
 class ReviewScreen extends StatefulWidget {
   final String cep;
   final String address;
+  final NotebookBloc notebookBloc;
 
   const ReviewScreen({
     super.key,
     required this.cep,
     required this.address,
+    required this.notebookBloc,
   });
 
   @override
@@ -137,9 +142,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
   void _onConfirm() {
     final number = _numberController.text;
     final complement = _complementController.text;
-
-    print('Número: $number');
-    print('Complemento: $complement');
+    widget.notebookBloc.add(AddAddress(
+      Address(
+        cep: widget.cep,
+        street: widget.address,
+        number: number,
+        complement: complement,
+      ),
+    ));
     context.go('/home?tab=1');
   }
 

@@ -10,34 +10,41 @@ part 'notebook_state.dart';
 class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
   NotebookBloc() : super(NotebookLoading()) {
     on<LoadAddresses>(_onLoadAddresses);
-    on<SearchChanged>(_onSearchChanged);
+    on<SearchChangedNotebook>(_onSearchChanged);
+    on<AddAddress>(_onAddAddress);
   }
+
+  final List<Address> _addresses = [];
 
   void _onLoadAddresses(
     LoadAddresses event,
     Emitter<NotebookState> emit,
   ) {
-    // Mocking some addresses
-    final addresses = List.generate(
-      10,
-      (index) => Address(
-        cep: '12345-$index',
-        street: 'Street $index',
-      ),
-    );
-    emit(NotebookLoaded(addresses));
+    emit(NotebookLoaded(_addresses));
+  }
+
+  void _onAddAddress(
+    AddAddress event,
+    Emitter<NotebookState> emit,
+  ) {
+    emit(NotebookLoading());
+    _addresses.add(event.address);
+
+    emit(NotebookLoaded(List<Address>.from(_addresses)));
   }
 
   void _onSearchChanged(
-    SearchChanged event,
+    SearchChangedNotebook event,
     Emitter<NotebookState> emit,
   ) {
     if (state is NotebookLoaded) {
-      final currentState = state as NotebookLoaded;
-      final filteredAddresses = currentState.addresses
+      final filteredAddresses = _addresses
           .where((address) => address.cep.contains(event.query) || address.street.contains(event.query))
           .toList();
       emit(NotebookLoaded(filteredAddresses));
+      if(event.query.isEmpty) {
+        emit(NotebookLoaded(_addresses));
+      }
     }
   }
 }
