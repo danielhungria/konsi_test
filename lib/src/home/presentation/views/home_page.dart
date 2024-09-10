@@ -40,13 +40,12 @@ class _HomePageState extends State<HomePage> {
       child: BlocBuilder<NavigationBloc, NavigationState>(
         builder: (context, state) {
           final selectedIndex = state is NavigationTabChanged ? state.index : widget.initialTab;
-
           return Scaffold(
             body: IndexedStack(
               index: selectedIndex,
-              children: [
-                MapScreen(mapBloc: mapBloc, notebookBloc: notebookBloc),
-                NotebookScreen(notebookBloc: notebookBloc),
+              children: const [
+                MapScreen(),
+                NotebookScreen(),
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(

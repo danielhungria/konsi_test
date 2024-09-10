@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:konsi_test/core/services/injection_container.dart';
 
 import '../../src/home/presentation/views/home_page.dart';
 import '../../src/notebook/presentation/bloc/notebook_bloc.dart';
@@ -27,10 +28,9 @@ class AppRouter {
           final args = state.extra as Map<String, dynamic>;
           final cep = args['cep']!;
           final address = args['address']!;
-          final notebookBloc = args['notebookBloc']!;
           return BlocProvider.value(
-            value: notebookBloc as NotebookBloc,
-            child: ReviewScreen(cep: cep, address: address, notebookBloc: notebookBloc),
+            value: sl<NotebookBloc>(),
+            child: ReviewScreen(cep: cep, address: address),
           );
         },
       ),

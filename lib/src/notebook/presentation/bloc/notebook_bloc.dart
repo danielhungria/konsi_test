@@ -12,6 +12,7 @@ class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
     on<LoadAddresses>(_onLoadAddresses);
     on<SearchChangedNotebook>(_onSearchChanged);
     on<AddAddress>(_onAddAddress);
+    on<RemoveAddress>(_onRemoveAddress);
   }
 
   final List<Address> _addresses = [];
@@ -20,6 +21,7 @@ class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
     LoadAddresses event,
     Emitter<NotebookState> emit,
   ) {
+    emit(NotebookLoading());
     emit(NotebookLoaded(_addresses));
   }
 
@@ -47,4 +49,15 @@ class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
       }
     }
   }
+
+  void _onRemoveAddress(
+    RemoveAddress event,
+    Emitter<NotebookState> emit,
+  ) {
+    emit(NotebookLoading());
+    _addresses.remove(event.address);
+
+    emit(NotebookLoaded(List<Address>.from(_addresses)));
+  }
+
 }

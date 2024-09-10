@@ -68,6 +68,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       emit(ShowBottomSheetState(cep, address));
 
       emit(MapWithMarkers(latLng, markers));
+    }else{
+      emit(const MapError('Erro ao buscar dados do CEP'));
     }
   }
 

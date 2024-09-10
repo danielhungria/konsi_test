@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:konsi_test/core/res/colours.dart';
 
+import '../../../../core/services/injection_container.dart';
 import '../../../map/presentation/widgets/search_bar_widget.dart';
 import '../bloc/notebook_bloc.dart';
 
 class NotebookScreen extends StatefulWidget {
-  final NotebookBloc notebookBloc;
-  const NotebookScreen({super.key, required this.notebookBloc});
+  const NotebookScreen({super.key});
 
   @override
   State<NotebookScreen> createState() => _NotebookScreenState();
@@ -18,7 +18,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
   @override
   void initState() {
     super.initState();
-    widget.notebookBloc.add(LoadAddresses());
+    sl<NotebookBloc>().add(LoadAddresses());
   }
 
   @override
@@ -29,7 +29,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: widget.notebookBloc,
+      value: sl<NotebookBloc>(),
       child: Scaffold(
         backgroundColor: Colours.lightTileBackgroundColour,
         body: Column(
@@ -39,7 +39,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
               child: SearchBarWidget(
                 focusNode: FocusNode(),
                 onSearchChanged: (query) {
-                  widget.notebookBloc.add(SearchChangedNotebook(query));
+                  sl<NotebookBloc>().add(SearchChangedNotebook(query));
                 },
               ),
             ),
@@ -72,7 +72,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
                               color: Colours.primaryColour,
                             ),
                             onPressed: () {
-                              // notebookBloc.add(RemoveAddress(address));
+                              sl<NotebookBloc>().add(RemoveAddress(address));
                             },
                           ),
                         );

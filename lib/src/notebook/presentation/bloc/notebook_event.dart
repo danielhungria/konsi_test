@@ -1,5 +1,4 @@
 part of 'notebook_bloc.dart';
-// lib/src/features/notebook/presentation/bloc/notebook_event.dart
 
 abstract class NotebookEvent extends Equatable {
   @override
@@ -25,6 +24,15 @@ class AddAddress extends NotebookEvent {
   final Address address;
 
   AddAddress(this.address);
+
+  @override
+  List<Object> get props => [address];
+}
+
+class RemoveAddress extends NotebookEvent {
+  final Address address;
+
+  RemoveAddress(this.address);
 
   @override
   List<Object> get props => [address];

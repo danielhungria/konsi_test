@@ -4,19 +4,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:konsi_test/core/res/colours.dart';
 import 'package:konsi_test/core/utils/core_utils.dart';
 
-import '../../../notebook/presentation/bloc/notebook_bloc.dart';
+import '../../../../core/services/injection_container.dart';
 import '../bloc/map_bloc.dart';
 import '../widgets/cep_bottom_sheet.dart';
 import '../widgets/search_bar_widget.dart';
 
 class MapScreen extends StatefulWidget {
-  final MapBloc mapBloc;
-  final NotebookBloc notebookBloc;
 
   const MapScreen({
     super.key,
-    required this.mapBloc,
-    required this.notebookBloc,
   });
 
   @override
@@ -31,19 +27,22 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: widget.mapBloc,
+      value: sl<MapBloc>(),
       child: BlocConsumer<MapBloc, MapState>(
         listener: (context, state) {
           if (state is ShowBottomSheetState) {
             _showBottomSheet(context, state.cep, state.endereco);
+          }
+          if (state is MapError){
+            CoreUtils.showSnackBar(context, state.message);
           }
         },
         builder: (context, state) {
           return Stack(
             children: [
               if (state is MapWithMarkers || state is MapInitial) _buildMap(state),
-              if (state is SearchResults || state is SearchResultError)
-                _buildSearchResultsOrError(state, widget.mapBloc),
+              if (state is SearchResults || state is SearchResultError || state is MapError)
+                _buildSearchResultsOrError(state),
               Positioned(
                 top: 70,
                 left: 10,
@@ -51,7 +50,7 @@ class _MapScreenState extends State<MapScreen> {
                 child: SearchBarWidget(
                   focusNode: focusNode,
                   onSearchChanged: (search) {
-                    widget.mapBloc.add(SearchChanged(search));
+                    sl<MapBloc>().add(SearchChanged(search));
                     cepNumber = search;
                   },
                 ),
@@ -79,15 +78,16 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildSearchResultsOrError(MapState state, MapBloc mapBloc) {
+  Widget _buildSearchResultsOrError(MapState state) {
+    final message = state is SearchResultError ? state.message : state is MapError ? state.message : '';
     return Positioned.fill(
       child: Scaffold(
         backgroundColor: Colours.lightTileBackgroundColour,
         body: Column(
           children: [
             const SizedBox(height: 130),
-            if (state is SearchResultError)
-              _buildErrorWidget(state)
+            if (state is SearchResultError || state is MapError)
+              _buildErrorWidget(message)
             else if (state is SearchResults)
               _buildSearchResultsList(state)
           ],
@@ -97,7 +97,7 @@ class _MapScreenState extends State<MapScreen> {
           onPressed: () {
             focusNode.unfocus();
             if (cepNumber.isNotEmpty && cepNumber.length == 8) {
-              mapBloc.add(ClickSearch(cepNumber));
+              sl<MapBloc>().add(ClickSearch(cepNumber));
             } else {
               CoreUtils.showSnackBar(context, 'INVALID CEP');
             }
@@ -108,14 +108,14 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildErrorWidget(SearchResultError state) {
+  Widget _buildErrorWidget(String message) {
     return Expanded(
       child: SizedBox(
         width: double.infinity,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            'INVALID CEP: ${state.message}',
+            'INVALID CEP: $message',
           ),
         ),
       ),
@@ -142,7 +142,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
             onTap: () {
               focusNode.unfocus();
-              widget.mapBloc.add(ResultSelected(result));
+              sl<MapBloc>().add(ResultSelected(result));
             },
           );
         },
@@ -167,7 +167,6 @@ class _MapScreenState extends State<MapScreen> {
         return CepBottomSheet(
           cep: cep,
           address: address,
-          notebookBloc: widget.notebookBloc,
         );
       },
     );

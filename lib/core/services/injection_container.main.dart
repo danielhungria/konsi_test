@@ -39,7 +39,7 @@ Future<void> _initOnBoarding() async {
     ..registerLazySingleton(
       () => NotebookBloc(),
     )
-    ..registerFactory(
+    ..registerLazySingleton(
       () => MapBloc(
         sl(),
         sl(),
