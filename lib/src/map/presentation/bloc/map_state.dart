@@ -13,8 +13,9 @@ class MapInitial extends MapState {
 
 class SearchResults extends MapState {
   final List<Cep> cep;
+  final String formattedAddress;
 
-  const SearchResults(this.cep);
+  const SearchResults(this.cep, this.formattedAddress);
 
   @override
   List<Object> get props => [cep];
@@ -50,10 +51,10 @@ class MapError extends MapState {
 
 class ShowBottomSheetState extends MapState {
   final String cep;
-  final String endereco;
+  final String formattedAddress;
 
-  const ShowBottomSheetState(this.cep, this.endereco);
+  const ShowBottomSheetState(this.cep, this.formattedAddress);
 
   @override
-  List<Object> get props => [cep, endereco];
+  List<Object> get props => [cep, formattedAddress];
 }

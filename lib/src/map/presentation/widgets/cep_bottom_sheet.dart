@@ -4,12 +4,12 @@ import 'package:konsi_test/core/res/colours.dart';
 
 class CepBottomSheet extends StatelessWidget {
   final String cep;
-  final String address;
+  final String formattedAddress;
 
   const CepBottomSheet({
     super.key,
     required this.cep,
-    required this.address,
+    required this.formattedAddress,
   });
 
   @override
@@ -31,7 +31,7 @@ class CepBottomSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8.0),
             Text(
-              address,
+              formattedAddress,
               style: const TextStyle(fontSize: 16),
               textAlign: TextAlign.center,
             ),
@@ -51,7 +51,7 @@ class CepBottomSheet extends StatelessWidget {
                     '/review',
                     extra: {
                       'cep': cep,
-                      'address': address,
+                      'address': formattedAddress,
                     },
                   );
                 },

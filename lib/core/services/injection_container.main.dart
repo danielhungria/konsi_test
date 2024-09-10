@@ -4,6 +4,7 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   await _initOnBoarding();
+  await _initHive();
 }
 
 Future<void> _initOnBoarding() async {
@@ -37,10 +38,13 @@ Future<void> _initOnBoarding() async {
   // Bloc
   sl
     ..registerLazySingleton(
-      () => NotebookBloc(),
+      () => NotebookBloc(
+        sl(),
+      ),
     )
     ..registerLazySingleton(
       () => MapBloc(
+        sl(),
         sl(),
         sl(),
       ),
@@ -52,4 +56,17 @@ Future<void> _initOnBoarding() async {
   // External
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => GeocodingService());
+}
+
+Future<void> _initHive() async {
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(CepAdapter());
+  Hive.registerAdapter(AddressAdapter());
+
+  var historyBox = await Hive.openBox<Cep>('historyBox');
+  var addressBox = await Hive.openBox<Address>('addressBox');
+
+  sl.registerLazySingleton<Box<Cep>>(() => historyBox);
+  sl.registerLazySingleton<Box<Address>>(() => addressBox);
 }

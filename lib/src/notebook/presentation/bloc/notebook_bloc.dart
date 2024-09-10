@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../domain/entities/address.dart';
 
@@ -8,14 +9,17 @@ part 'notebook_event.dart';
 part 'notebook_state.dart';
 
 class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
-  NotebookBloc() : super(NotebookLoading()) {
+  NotebookBloc(this.addressBox) : super(NotebookLoading()) {
     on<LoadAddresses>(_onLoadAddresses);
     on<SearchChangedNotebook>(_onSearchChanged);
     on<AddAddress>(_onAddAddress);
     on<RemoveAddress>(_onRemoveAddress);
+
+    _addresses = List<Address>.from(addressBox.values);
   }
 
-  final List<Address> _addresses = [];
+  final Box<Address> addressBox;
+  List<Address> _addresses = [];
 
   void _onLoadAddresses(
     LoadAddresses event,
@@ -31,7 +35,7 @@ class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
   ) {
     emit(NotebookLoading());
     _addresses.add(event.address);
-
+    addressBox.add(event.address);
     emit(NotebookLoaded(List<Address>.from(_addresses)));
   }
 
@@ -56,7 +60,7 @@ class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
   ) {
     emit(NotebookLoading());
     _addresses.remove(event.address);
-
+    addressBox.delete(event.address.key);
     emit(NotebookLoaded(List<Address>.from(_addresses)));
   }
 

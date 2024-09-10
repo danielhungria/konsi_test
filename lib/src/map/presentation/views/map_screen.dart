@@ -31,7 +31,7 @@ class _MapScreenState extends State<MapScreen> {
       child: BlocConsumer<MapBloc, MapState>(
         listener: (context, state) {
           if (state is ShowBottomSheetState) {
-            _showBottomSheet(context, state.cep, state.endereco);
+            _showBottomSheet(context, state.cep, state.formattedAddress);
           }
           if (state is MapError){
             CoreUtils.showSnackBar(context, state.message);
@@ -129,7 +129,7 @@ class _MapScreenState extends State<MapScreen> {
         itemBuilder: (context, index) {
           final result = state.cep[index];
           final cep = result.cep;
-          final address = result.bairro;
+          final formattedAddress = '${result.logradouro} - ${result.bairro}, ${result.localidade} - ${result.uf}';
           return ListTile(
             leading: const Icon(Icons.location_on, color: Colours.primaryColour),
             title: Text(
@@ -137,7 +137,7 @@ class _MapScreenState extends State<MapScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              address,
+              formattedAddress,
               overflow: TextOverflow.ellipsis,
             ),
             onTap: () {
@@ -151,7 +151,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _showBottomSheet(BuildContext context, String cep, String address) {
+  void _showBottomSheet(BuildContext context, String cep, String formattedAddress) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -166,7 +166,7 @@ class _MapScreenState extends State<MapScreen> {
       builder: (BuildContext context) {
         return CepBottomSheet(
           cep: cep,
-          address: address,
+          formattedAddress: formattedAddress,
         );
       },
     );
