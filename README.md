@@ -1,4 +1,3 @@
-```markdown
 # Aplicativo de CEP
 
 Um aplicativo Flutter desenvolvido para ajudar a pesquisar e registrar endereços de CEP. O app permite buscar CEPs, visualizar e editar endereços salvos e possui uma interface intuitiva e responsiva.
@@ -65,5 +64,3 @@ Este aplicativo Flutter facilita a busca e o gerenciamento de endereços baseado
 ## Uso
 
 Ao iniciar o aplicativo, você verá a tela inicial com duas abas: "Mapa" e "Caderneta". Use a barra de pesquisa na tela de Mapa para buscar CEPs. Na tela de Caderneta, você pode visualizar e gerenciar endereços salvos. A interface é responsiva e fácil de usar, projetada para fornecer uma experiência intuitiva.
-
-```
