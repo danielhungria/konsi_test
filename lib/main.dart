@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Konsi App',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       routerConfig: _appRouter.router,
     );

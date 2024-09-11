@@ -25,12 +25,17 @@ class AppRouter {
       GoRoute(
         path: '/review',
         builder: (context, state) {
+          bool isFromNotebook = false;
           final args = state.extra as Map<String, dynamic>;
-          final cep = args['cep']!;
-          final address = args['address']!;
+          final address = args['address'];
+          final cep = args['cep'];
+          final formattedAddress = args['formattedAddress']!;
+          if(args.containsKey('isFromNotebook')){
+            isFromNotebook = args['isFromNotebook']!;
+          }
           return BlocProvider.value(
             value: sl<NotebookBloc>(),
-            child: ReviewScreen(cep: cep, address: address),
+            child: ReviewScreen(address: address, cep: cep,formattedAddress: formattedAddress, isFromNotebook: isFromNotebook),
           );
         },
       ),

@@ -7,13 +7,17 @@ import '../../../../core/services/injection_container.dart';
 import '../../../notebook/domain/entities/address.dart';
 
 class ReviewScreen extends StatefulWidget {
+  final Address? address;
   final String cep;
-  final String address;
+  final String formattedAddress;
+  final bool isFromNotebook;
 
   const ReviewScreen({
     super.key,
-    required this.cep,
     required this.address,
+    required this.cep,
+    required this.formattedAddress,
+    required this.isFromNotebook,
   });
 
   @override
@@ -27,8 +31,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
   @override
   void initState() {
     super.initState();
-    _numberController.text = '';
-    _complementController.text = '';
+    _numberController.text = widget.address?.number ?? '';
+    _complementController.text = widget.address?.complement ?? '';
   }
 
   @override
@@ -64,34 +68,39 @@ class _ReviewScreenState extends State<ReviewScreen> {
             const SizedBox(height: 16.0),
             _buildTextField(
               label: 'Endereço',
-              initialValue: widget.address,
+              initialValue: widget.formattedAddress,
               readOnly: true,
             ),
             const SizedBox(height: 16.0),
             _buildTextField(
               label: 'Número',
               controller: _numberController,
+              readOnly: widget.isFromNotebook,
             ),
             const SizedBox(height: 16.0),
             _buildTextField(
               label: 'Complemento',
               controller: _complementController,
+              readOnly: widget.isFromNotebook,
             ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colours.primaryColour,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            Visibility(
+              visible: !widget.isFromNotebook,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colours.primaryColour,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                onPressed: _onConfirm,
-                child: const Text(
-                  'Confirmar',
-                  style: TextStyle(color: Colors.white),
+                  onPressed: _onConfirm,
+                  child: const Text(
+                    'Confirmar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),
@@ -144,7 +153,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     sl<NotebookBloc>().add(AddAddress(
       Address(
         cep: widget.cep,
-        street: widget.address,
+        street: widget.formattedAddress,
         number: number,
         complement: complement,
       ),

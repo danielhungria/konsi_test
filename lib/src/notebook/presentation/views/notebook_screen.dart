@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
 
 import '../../../../core/services/injection_container.dart';
@@ -77,14 +78,15 @@ class _NotebookScreenState extends State<NotebookScreen> {
                             },
                           ),
                           onTap: () {
-                            //TODO -
-                            // context.go(
-                            //   '/review',
-                            //   extra: {
-                            //     'cep': address.cep,
-                            //     'address': formattedAddress,
-                            //   },
-                            // );
+                            context.go(
+                              '/review',
+                              extra: {
+                                'cep': address.cep,
+                                'address': address,
+                                'formattedAddress': formattedAddress,
+                                'isFromNotebook': true,
+                              },
+                            );
                           },
                         );
                       },
