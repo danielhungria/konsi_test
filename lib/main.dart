@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:konsi_test/core/res/app_theme.dart';
+import 'package:konsi_test/core/services/injection_container.dart';
 
-import 'core/router/app_router.dart';
+import 'core/services/app_router.dart';
 
 void main() {
+  init();
   runApp(MyApp());
 }
 
@@ -15,6 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Konsi App',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       routerConfig: _appRouter.router,
     );

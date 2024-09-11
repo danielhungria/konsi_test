@@ -17,10 +17,34 @@ class SearchChanged extends MapEvent {
 }
 
 class ResultSelected extends MapEvent {
-  final String address;
+  final Cep cep;
 
-  const ResultSelected(this.address);
+  const ResultSelected(this.cep);
 
   @override
-  List<Object> get props => [address];
+  List<Object> get props => [cep];
+}
+
+class MapTap extends MapEvent {
+  final LatLng position;
+
+  const MapTap(this.position);
+
+  @override
+  List<Object> get props => [position];
+}
+
+class ClickSearch extends MapEvent {
+  final String query;
+
+  const ClickSearch(this.query);
+
+  @override
+  List<Object> get props => [query];
+}
+
+class ResetMap extends MapEvent {
+
+  @override
+  List<Object> get props => [];
 }

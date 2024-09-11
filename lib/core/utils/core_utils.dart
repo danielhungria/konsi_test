@@ -25,4 +25,12 @@ class CoreUtils {
         ),
       );
   }
+
+  static String formatCep(String value) {
+    if (value.length > 5) {
+      return '${value.substring(0, 5)}-${value.substring(5)}';
+    }
+    return value;
+  }
+
 }
