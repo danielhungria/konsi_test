@@ -1,7 +1,9 @@
 
+import 'package:equatable/equatable.dart';
+
 import '../../domain/entities/cep.dart';
 
-class CepModel extends Cep {
+class CepModel extends Cep with EquatableMixin {
   CepModel({
     required super.cep,
     required super.logradouro,
@@ -35,4 +37,15 @@ class CepModel extends Cep {
       'ddd': ddd,
     };
   }
+
+  @override
+  List<Object?> get props => [
+    cep,
+    logradouro,
+    bairro,
+    localidade,
+    uf,
+    estado,
+    ddd,
+  ];
 }

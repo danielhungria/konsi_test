@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:konsi_test/core/res/colours.dart';
 import 'package:konsi_test/core/services/app_router.dart';
 import 'package:konsi_test/src/notebook/presentation/bloc/notebook_bloc.dart';
@@ -71,6 +72,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             _buildTextField(
               label: 'Número',
               controller: _numberController,
+              digitOnly: true,
             ),
             const SizedBox(height: 16.0),
             _buildTextField(
@@ -106,12 +108,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
     String? initialValue,
     TextEditingController? controller,
     bool readOnly = false,
+    bool digitOnly = false,
   }) {
     return TextFormField(
       controller: controller,
       initialValue: initialValue,
       readOnly: readOnly,
       enableInteractiveSelection: !readOnly,
+      inputFormatters: [
+        digitOnly ? FilteringTextInputFormatter.digitsOnly : FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z]')),
+      ],
+      keyboardType: digitOnly ? TextInputType.number : TextInputType.text,
       focusNode: readOnly ? AlwaysDisabledFocusNode() : null,
       style: TextStyle(
         color: readOnly ? Colours.neutralTextColour : Colours.darkTextColour,
@@ -151,7 +158,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
     ));
     RouterHelper.goHome(context, tab: 1);
   }
-
 }
 
 class AlwaysDisabledFocusNode extends FocusNode {

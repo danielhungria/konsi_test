@@ -6,6 +6,7 @@ import '../../domain/usecases/get_addresses.dart';
 import '../../domain/usecases/remove_address.dart';
 
 part 'notebook_event.dart';
+
 part 'notebook_state.dart';
 
 class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
@@ -48,11 +49,16 @@ class NotebookBloc extends Bloc<NotebookEvent, NotebookState> {
   void _onAddAddress(
     AddAddress event,
     Emitter<NotebookState> emit,
-  ) {
+  ) async {
     emit(NotebookLoading());
-    _addresses.add(event.address);
-    addAddressUsecase.call(AddAddressParams(address: event.address));
-    emit(NotebookLoaded(List<Address>.from(_addresses)));
+    final result = await addAddressUsecase.call(AddAddressParams(address: event.address));
+    result.fold(
+      (failure) => emit(NotebookLoaded(List<Address>.from(_addresses))),
+      (_) {
+        _addresses.add(event.address);
+        emit(NotebookLoaded(List<Address>.from(_addresses)));
+      },
+    );
   }
 
   void _onSearchChanged(

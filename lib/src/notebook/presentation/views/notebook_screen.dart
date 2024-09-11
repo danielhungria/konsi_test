@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import 'package:konsi_test/src/notebook/domain/entities/address.dart';
 
 import '../../../../core/services/injection_container.dart';
 import '../../../map/presentation/widgets/search_bar_widget.dart';
@@ -99,7 +100,7 @@ class _NotebookScreenState extends State<NotebookScreen> {
                               },
                             ),
                             onTap: () {
-                              //TODO: Show dialog with info
+                              _showAddressDetailsDialog(context, address);
                             },
                           );
                         },
@@ -139,4 +140,34 @@ class _NotebookScreenState extends State<NotebookScreen> {
       ),
     );
   }
+
+  void _showAddressDetailsDialog(BuildContext context, Address address) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Detalhes do Endereço'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('CEP: ${address.cep}'),
+              Text('Rua: ${address.street}'),
+              Text('Número: ${address.number}'),
+              Text('Complemento: ${address.complement}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Fechar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

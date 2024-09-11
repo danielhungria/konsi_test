@@ -26,7 +26,7 @@ class CepRepositoryImpl implements CepRepository {
       if (e is ServerException) {
         return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
       } else {
-        return Left(ServerFailure(message: 'Erro desconhecido', statusCode: null));
+        return Left(ServerFailure(message: 'Erro desconhecido', statusCode: 500));
       }
     }
   }
@@ -38,9 +38,9 @@ class CepRepositoryImpl implements CepRepository {
       return const Right(null);
     } catch (e) {
       if (e is CacheException) {
-        return Left(CacheFailure(message: e.message, statusCode: null));
+        return Left(CacheFailure(message: e.message, statusCode: 500));
       } else {
-        return Left(CacheFailure(message: 'Erro ao salvar o CEP localmente', statusCode: null));
+        return Left(CacheFailure(message: 'Erro ao salvar o CEP localmente', statusCode: 500));
       }
     }
   }
@@ -51,7 +51,7 @@ class CepRepositoryImpl implements CepRepository {
       final history = localDataSource.getHistory();
       return Right(history);
     } catch (e) {
-      return Left(CacheFailure(message: 'Erro ao buscar histórico de CEPs', statusCode: null));
+      return Left(CacheFailure(message: 'Erro ao buscar histórico de CEPs', statusCode: 500));
     }
   }
 }

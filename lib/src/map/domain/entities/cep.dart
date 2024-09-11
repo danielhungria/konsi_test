@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'cep.g.dart';
 
 @HiveType(typeId: 0)
-class Cep extends HiveObject {
+class Cep extends HiveObject with EquatableMixin {
   @HiveField(0)
   final String cep;
 
@@ -34,4 +35,15 @@ class Cep extends HiveObject {
     required this.estado,
     required this.ddd,
   });
+
+  @override
+  List<Object?> get props => [
+    cep,
+    logradouro,
+    bairro,
+    localidade,
+    uf,
+    estado,
+    ddd,
+  ];
 }

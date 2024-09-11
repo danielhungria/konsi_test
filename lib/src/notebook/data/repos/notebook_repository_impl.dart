@@ -21,9 +21,9 @@ class NotebookRepositoryImpl implements NotebookRepository {
       return const Right(null);
     } catch (e) {
       if (e is CacheException) {
-        return Left(CacheFailure(message: e.message, statusCode: null));
+        return Left(CacheFailure(message: e.message, statusCode: e.statusCode));
       } else {
-        return Left(CacheFailure(message: 'Erro ao salvar o endereço localmente', statusCode: null));
+        return Left(CacheFailure(message: 'Erro ao salvar o endereço localmente', statusCode: 500));
       }
     }
   }
@@ -34,7 +34,7 @@ class NotebookRepositoryImpl implements NotebookRepository {
       final addresses = localDataSource.getAddresses();
       return Right(addresses);
     } catch (e) {
-      return Left(CacheFailure(message: 'Erro ao buscar endereços', statusCode: null));
+      return Left(CacheFailure(message: 'Erro ao buscar endereços', statusCode: 500));
     }
   }
 
@@ -45,9 +45,9 @@ class NotebookRepositoryImpl implements NotebookRepository {
       return const Right(null);
     } catch (e) {
       if (e is CacheException) {
-        return Left(CacheFailure(message: e.message, statusCode: null));
+        return Left(CacheFailure(message: e.message, statusCode: e.statusCode));
       } else {
-        return Left(CacheFailure(message: 'Erro ao remover o endereço localmente', statusCode: null));
+        return Left(CacheFailure(message: 'Erro ao remover o endereço localmente', statusCode: 500));
       }
     }
   }
