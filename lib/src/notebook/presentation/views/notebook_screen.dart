@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
 
 import '../../../../core/services/injection_container.dart';
@@ -15,7 +14,6 @@ class NotebookScreen extends StatefulWidget {
 }
 
 class _NotebookScreenState extends State<NotebookScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -50,52 +48,88 @@ class _NotebookScreenState extends State<NotebookScreen> {
                   if (state is NotebookLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is NotebookLoaded) {
-                    return ListView.separated(
-                      itemCount: state.addresses.length,
-                      itemBuilder: (context, index) {
-                        final address = state.addresses[index];
-                        final formattedAddress = '${address.street}, ${address.number} - ${address.complement}';
-                        return ListTile(
-                          title: Text(
-                            address.cep,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            formattedAddress,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                          trailing: IconButton(
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(Colours.softBackgroundColour),
-                            ),
-                            icon: const Icon(
-                              Icons.bookmark,
+                    if (state.addresses.isEmpty) {
+                      return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.location_off,
+                              size: 80,
                               color: Colours.primaryColour,
                             ),
-                            onPressed: () {
-                              sl<NotebookBloc>().add(RemoveAddress(address));
-                            },
-                          ),
-                          onTap: () {
-                            context.go(
-                              '/review',
-                              extra: {
-                                'cep': address.cep,
-                                'address': address,
-                                'formattedAddress': formattedAddress,
-                                'isFromNotebook': true,
+                            SizedBox(height: 20),
+                            Text(
+                              'Nenhum endereço salvo.',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colours.darkTextColour,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return ListView.separated(
+                        itemCount: state.addresses.length,
+                        itemBuilder: (context, index) {
+                          final address = state.addresses[index];
+                          final formattedAddress = '${address.street}, ${address.number} - ${address.complement}';
+                          return ListTile(
+                            title: Text(
+                              address.cep,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              formattedAddress,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            trailing: IconButton(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(Colours.softBackgroundColour),
+                              ),
+                              icon: const Icon(
+                                Icons.bookmark,
+                                color: Colours.primaryColour,
+                              ),
+                              onPressed: () {
+                                sl<NotebookBloc>().add(RemoveAddress(address));
                               },
-                            );
-                          },
-                        );
-                      },
-                      separatorBuilder: (context, index) => const Divider(color: Colours.borderColour),
+                            ),
+                            onTap: () {
+                              //TODO: Show dialog with info
+                            },
+                          );
+                        },
+                        separatorBuilder: (context, index) => const Divider(color: Colours.borderColour),
+                      );
+                    }
+                  } else if (state is NotebookError) {
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error,
+                            size: 80,
+                            color: Colours.primaryColour,
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            'Erro ao carregar endereços.',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colours.darkTextColour,
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   } else {
-                    return const Center(
-                      child: Text('Nenhum endereço salvo.'),
-                    );
+                    return const SizedBox();
                   }
                 },
               ),

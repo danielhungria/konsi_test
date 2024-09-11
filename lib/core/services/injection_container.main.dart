@@ -9,18 +9,32 @@ Future<void> init() async {
 
 Future<void> _initOnBoarding() async {
   // DataSources
-  sl.registerLazySingleton<CepRemoteDataSource>(
-    () => CepRemoteDataSourceImpl(
-      client: sl(),
-    ),
-  );
+  sl
+    ..registerLazySingleton<CepRemoteDataSource>(
+      () => CepRemoteDataSourceImpl(
+        client: sl(),
+      ),
+    )
+    ..registerLazySingleton<CepLocalDataSource>(
+      () => CepLocalDataSourceImpl(),
+    )
+    ..registerLazySingleton<NotebookLocalDataSource>(
+      () => NotebookLocalDataSourceImpl(),
+    );
 
   // Repositories
-  sl.registerLazySingleton<CepRepository>(
-    () => CepRepositoryImpl(
-      remoteDataSource: sl(),
-    ),
-  );
+  sl
+    ..registerLazySingleton<CepRepository>(
+      () => CepRepositoryImpl(
+        remoteDataSource: sl(),
+        localDataSource: sl(),
+      ),
+    )
+    ..registerLazySingleton<NotebookRepository>(
+      () => NotebookRepositoryImpl(
+        localDataSource: sl(),
+      ),
+    );
 
   // UseCases
   sl
@@ -30,20 +44,44 @@ Future<void> _initOnBoarding() async {
       ),
     )
     ..registerLazySingleton(
-      () => FetchCepParams(
-        cep: '',
+      () => AddHistoryUsecase(
+        sl(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => GetHistoryUsecase(
+        sl(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => RemoveAddressUsecase(
+        sl(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => AddAddressUsecase(
+        sl(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => GetAddressesUsecase(
+        sl(),
       ),
     );
+
 
   // Bloc
   sl
     ..registerLazySingleton(
       () => NotebookBloc(
         sl(),
+        sl(),
+        sl(),
       ),
     )
     ..registerLazySingleton(
       () => MapBloc(
+        sl(),
         sl(),
         sl(),
         sl(),
@@ -60,13 +98,9 @@ Future<void> _initOnBoarding() async {
 
 Future<void> _initHive() async {
   await Hive.initFlutter();
-
   Hive.registerAdapter(CepAdapter());
   Hive.registerAdapter(AddressAdapter());
 
-  var historyBox = await Hive.openBox<Cep>('historyBox');
-  var addressBox = await Hive.openBox<Address>('addressBox');
-
-  sl.registerLazySingleton<Box<Cep>>(() => historyBox);
-  sl.registerLazySingleton<Box<Address>>(() => addressBox);
+  await CepLocalDataSourceImpl.init();
+  await NotebookLocalDataSourceImpl.init();
 }

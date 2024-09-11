@@ -1,5 +1,6 @@
 class MediaRes {
   const MediaRes._();
+  //TODO ADD SVG
 
   // static const _baseVector = 'assets/vectors';
   // static const _baseImage = 'assets/images';

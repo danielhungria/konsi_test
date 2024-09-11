@@ -1,8 +1,10 @@
-import 'package:dartz/dartz.dart';
-
-import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/typdefs.dart';
 import '../entities/cep.dart';
 
 abstract class CepRepository {
-  Future<Either<Failure, Cep>> fetchCep(String cep);
+  ResultFuture<Cep> fetchCep(String cep);
+
+  Result<List<Cep>> getHistory();
+
+  ResultFuture addCep(Cep cep);
 }

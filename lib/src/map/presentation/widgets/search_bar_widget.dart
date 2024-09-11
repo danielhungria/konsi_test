@@ -7,11 +7,15 @@ import '../../../../core/utils/core_utils.dart';
 class SearchBarWidget extends StatefulWidget {
   final FocusNode focusNode;
   final void Function(String) onSearchChanged;
+  final void Function()? onTapOutside;
+  final void Function()? onSubmitted;
 
   const SearchBarWidget({
     super.key,
     required this.focusNode,
     required this.onSearchChanged,
+    this.onTapOutside,
+    this.onSubmitted,
   });
 
   @override
@@ -51,9 +55,12 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         ],
       ),
       child: TextField(
+        textAlignVertical: TextAlignVertical.center,
         controller: _controller,
         focusNode: widget.focusNode,
         keyboardType: TextInputType.number,
+        onTapOutside: (_) => widget.onTapOutside != null ? widget.onTapOutside!() : null,
+        onSubmitted: (_) => widget.onSubmitted != null ? widget.onSubmitted!() : null,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(8),

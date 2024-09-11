@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
             bottomNavigationBar: BottomNavigationBar(
               backgroundColor: Colours.lightTileBackgroundColour,
               items: const [
+                //TODO GET ICONS ON FIGMA
                 BottomNavigationBarItem(
                   icon: Icon(Icons.map),
                   label: 'Mapa',

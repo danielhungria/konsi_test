@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:konsi_test/core/extensions/context_extension.dart';
+import 'package:konsi_test/core/extensions/custom_size_extension.dart';
 import 'package:konsi_test/core/res/colours.dart';
 import 'package:konsi_test/core/utils/core_utils.dart';
 
@@ -10,7 +12,6 @@ import '../widgets/cep_bottom_sheet.dart';
 import '../widgets/search_bar_widget.dart';
 
 class MapScreen extends StatefulWidget {
-
   const MapScreen({
     super.key,
   });
@@ -20,20 +21,33 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  late MapBloc _mapBloc;
   GoogleMapController? _mapController;
   FocusNode focusNode = FocusNode();
   String cepNumber = '';
+  bool hasFocusSearchBar = false;
+
+  @override
+  void initState() {
+    _mapBloc = sl<MapBloc>();
+    focusNode.addListener(() {
+      setState(() {
+        hasFocusSearchBar = focusNode.hasFocus;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: sl<MapBloc>(),
+      value: _mapBloc,
       child: BlocConsumer<MapBloc, MapState>(
         listener: (context, state) {
           if (state is ShowBottomSheetState) {
             _showBottomSheet(context, state.cep, state.formattedAddress);
           }
-          if (state is MapError){
+          if (state is MapError) {
             CoreUtils.showSnackBar(context, state.message);
           }
         },
@@ -50,8 +64,14 @@ class _MapScreenState extends State<MapScreen> {
                 child: SearchBarWidget(
                   focusNode: focusNode,
                   onSearchChanged: (search) {
-                    sl<MapBloc>().add(SearchChanged(search));
+                    _mapBloc.add(SearchChanged(search));
                     cepNumber = search;
+                  },
+                  onTapOutside: () {
+                    focusNode.unfocus();
+                  },
+                  onSubmitted: () {
+                    focusNode.unfocus();
                   },
                 ),
               ),
@@ -77,37 +97,43 @@ class _MapScreenState extends State<MapScreen> {
       },
       onTap: (position) {
         focusNode.unfocus();
-        sl<MapBloc>().add(MapTap(position));
+        _mapBloc.add(MapTap(position));
       },
     );
   }
 
   Widget _buildSearchResultsOrError(MapState state) {
-    final message = state is SearchResultError ? state.message : state is MapError ? state.message : '';
+    final message = state is SearchResultError
+        ? state.message
+        : state is MapError
+            ? state.message
+            : '';
     return Positioned.fill(
       child: Scaffold(
         backgroundColor: Colours.lightTileBackgroundColour,
         body: Column(
           children: [
-            const SizedBox(height: 130),
+            (context.height * 0.09).h,
             if (state is SearchResultError || state is MapError)
               _buildErrorWidget(message)
             else if (state is SearchResults)
               _buildSearchResultsList(state)
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colours.primaryColour,
-          onPressed: () {
-            focusNode.unfocus();
-            if (cepNumber.isNotEmpty && cepNumber.length == 8) {
-              sl<MapBloc>().add(ClickSearch(cepNumber));
-            } else {
-              CoreUtils.showSnackBar(context, 'INVALID CEP');
-            }
-          },
-          child: const Icon(Icons.search),
-        ),
+        floatingActionButton: hasFocusSearchBar
+            ? FloatingActionButton(
+                backgroundColor: Colours.primaryColour,
+                onPressed: () {
+                  focusNode.unfocus();
+                  if (cepNumber.isNotEmpty && cepNumber.length == 8) {
+                    _mapBloc.add(ClickSearch(cepNumber));
+                  } else {
+                    CoreUtils.showSnackBar(context, 'INVALID CEP');
+                  }
+                },
+                child: const Icon(Icons.search),
+              )
+            : null,
       ),
     );
   }
@@ -116,11 +142,40 @@ class _MapScreenState extends State<MapScreen> {
     return Expanded(
       child: SizedBox(
         width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            'INVALID CEP: $message',
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.redAccent,
+              size: 80,
+            ),
+            20.h,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'O CEP informado é inválido:',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54,
+                ),
+              ),
+            ),
+            10.h,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -146,7 +201,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
             onTap: () {
               focusNode.unfocus();
-              sl<MapBloc>().add(ResultSelected(result));
+              _mapBloc.add(ResultSelected(result));
             },
           );
         },

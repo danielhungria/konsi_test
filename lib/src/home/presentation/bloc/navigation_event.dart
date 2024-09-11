@@ -1,4 +1,3 @@
-// lib/src/presentation/bloc/navigation_event.dart
 part of 'navigation_bloc.dart';
 
 abstract class NavigationEvent extends Equatable {

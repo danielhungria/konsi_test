@@ -1,33 +1,48 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:konsi_test/src/map/domain/entities/cep.dart';
 import 'package:konsi_test/src/map/domain/usecases/fetch_cep.dart';
 
 import '../../../../core/services/geocoding_service.dart';
+import '../../domain/usecases/add_history.dart';
+import '../../domain/usecases/get_history.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
+  final FetchCepUsecase fetchCepUsecase;
+  final GetHistoryUsecase getHistoryUsecase;
+  final AddHistoryUsecase addHistoryUsecase;
+  final GeocodingService geocodingService;
+
   MapBloc(
     this.fetchCepUsecase,
     this.geocodingService,
-    this.historyBox,
+    this.getHistoryUsecase,
+    this.addHistoryUsecase,
   ) : super(const MapInitial()) {
     on<SearchChanged>(_onSearchChanged);
     on<ResultSelected>(_onResultSelected);
     on<ClickSearch>(_onClickSearch);
     on<ResetMap>(_onResetMap);
     on<MapTap>(_onMapTap);
-    history = List<Cep>.from(historyBox.values);
+    _loadHistory();
   }
 
-  final FetchCepUsecase fetchCepUsecase;
-  final GeocodingService geocodingService;
-  final Box<Cep> historyBox;
   List<Cep> history = [];
+
+  Future<void> _loadHistory() async {
+    final result = await getHistoryUsecase.call();
+
+    result.fold(
+      (failure) => null,
+      (historyList) {
+        history = historyList;
+      },
+    );
+  }
 
   Future<void> _onSearchChanged(
     SearchChanged event,
@@ -43,16 +58,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     Emitter<MapState> emit,
   ) async {
     FetchCepParams params = FetchCepParams(cep: event.query);
-
     final result = await fetchCepUsecase.call(params);
 
     result.fold(
       (l) => emit(SearchResultError(l.errorMessage)),
-      (r) {
+      (r) async {
         final formattedAddress = '${r.logradouro} - ${r.bairro}, ${r.localidade} - ${r.uf}';
         if (!history.any((cep) => cep.cep == r.cep)) {
           history.insert(0, r);
-          historyBox.add(r);
+          addHistoryUsecase.call(AddHistoryParams(cep: r));
         }
         emit(SearchResults(_filterSearchResults(event.query), formattedAddress));
       },
@@ -88,7 +102,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     Emitter<MapState> emit,
   ) async {
     final latLng = event.position;
-
     final cep = await geocodingService.getCepFromLatLng(latLng);
 
     if (cep != null) {

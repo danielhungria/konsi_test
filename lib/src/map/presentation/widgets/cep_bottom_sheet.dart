@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import 'package:konsi_test/core/services/app_router.dart';
 
 class CepBottomSheet extends StatelessWidget {
   final String cep;
@@ -47,13 +47,7 @@ class CepBottomSheet extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.pop(context);
-                  context.go(
-                    '/review',
-                    extra: {
-                      'cep': cep,
-                      'formattedAddress': formattedAddress,
-                    },
-                  );
+                  RouterHelper.goReview(context, cep: cep, formattedAddress: formattedAddress);
                 },
                 child: const Text(
                   'Salvar Endereço',

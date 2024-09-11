@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:konsi_test/core/res/colours.dart';
+import 'package:konsi_test/core/services/app_router.dart';
 import 'package:konsi_test/src/notebook/presentation/bloc/notebook_bloc.dart';
 
 import '../../../../core/services/injection_container.dart';
 import '../../../notebook/domain/entities/address.dart';
 
 class ReviewScreen extends StatefulWidget {
-  final Address? address;
   final String cep;
   final String formattedAddress;
-  final bool isFromNotebook;
 
   const ReviewScreen({
     super.key,
-    required this.address,
     required this.cep,
     required this.formattedAddress,
-    required this.isFromNotebook,
   });
 
   @override
@@ -31,8 +27,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
   @override
   void initState() {
     super.initState();
-    _numberController.text = widget.address?.number ?? '';
-    _complementController.text = widget.address?.complement ?? '';
+    _numberController.text = '';
+    _complementController.text = '';
   }
 
   @override
@@ -52,7 +48,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            context.go('/home');
+            RouterHelper.goHome(context);
           },
         ),
       ),
@@ -75,32 +71,27 @@ class _ReviewScreenState extends State<ReviewScreen> {
             _buildTextField(
               label: 'Número',
               controller: _numberController,
-              readOnly: widget.isFromNotebook,
             ),
             const SizedBox(height: 16.0),
             _buildTextField(
               label: 'Complemento',
               controller: _complementController,
-              readOnly: widget.isFromNotebook,
             ),
             const Spacer(),
-            Visibility(
-              visible: !widget.isFromNotebook,
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colours.primaryColour,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colours.primaryColour,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  onPressed: _onConfirm,
-                  child: const Text(
-                    'Confirmar',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: _onConfirm,
+                child: const Text(
+                  'Confirmar',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
@@ -158,7 +149,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         complement: complement,
       ),
     ));
-    context.go('/home?tab=1');
+    RouterHelper.goHome(context, tab: 1);
   }
 
 }

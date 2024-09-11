@@ -24,7 +24,7 @@ class CepRemoteDataSourceImpl implements CepRemoteDataSource {
 
       if (jsonResponse['erro'] != null) {
         throw ServerException(
-          message: 'CEP no found',
+          message: 'CEP not found',
           statusCode: response.statusCode.toString(),
         );
       }

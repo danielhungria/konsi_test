@@ -1,4 +1,3 @@
-// lib/src/presentation/bloc/navigation_state.dart
 part of 'navigation_bloc.dart';
 
 abstract class NavigationState extends Equatable {
